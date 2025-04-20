@@ -21,3 +21,6 @@ sudo apt-get install python3-gi gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0
 Bước 5: (Tùy chọn) Cài đặt bindings GStreamer cho Python
 sudo apt-get install python3-gst-1.0
 ===Gói này chứa overrides cho GObject Introspection giúp Python thao tác trực tiếp với các lớp GStreamer=====
+
+Trước khi chạy script bằng python3 yourCode.py, hãy chắc chắn bạn đã thoát hẳn môi trường ảo (bằng lệnh deactivate hoặc conda deactivate) để Python sử dụng đúng interpreter và thư viện hệ thống. 
+Chạy file code thông qua cú pháp : python3 ___yourCode__.py
