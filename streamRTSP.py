@@ -3,6 +3,7 @@ import gi
 import argparse
 import signal
 import sys
+import socket
 
 # Yeu cau phien ban GStreamer 1.0
 gi.require_version('Gst', '1.0')
@@ -13,18 +14,20 @@ class MayChuRTSPCamera:
     def __init__(self, nguon_video='/dev/video0', 
                  rong=640, cao=480, 
                  khung_hinh=30, cong=8554, 
-                 duong_dan="/camera", ma_hoa="h264"):
+                 duong_dan="/camera", ma_hoa="h264",
+                 ip_address=None):
         """
         Khoi tao may chu RTSP voi camera
         
         Tham so:
-            nguon_video: Nguon video (mac dinh: /dev/video0 - minh su dung webcam nen se la video0)
+            nguon_video: Nguon video (mac dinh: /dev/video0)
             rong: Chieu rong video (mac dinh: 640)
             cao: Chieu cao video (mac dinh: 480)
             khung_hinh: Toc do khung hinh (mac dinh: 30)
             cong: Cong RTSP (mac dinh: 8554)
             duong_dan: Duong dan RTSP (mac dinh: /camera)
             ma_hoa: Ma hoa video (mac dinh: h264, co the la: h264, mjpeg)
+            ip_address: Dia chi IP may chu (mac dinh: lay IP tu he thong)
         """
         self.nguon_video = nguon_video
         self.rong = rong
@@ -33,6 +36,19 @@ class MayChuRTSPCamera:
         self.cong = cong
         self.duong_dan = duong_dan
         self.ma_hoa = ma_hoa
+        
+        # Lay dia chi IP
+        if ip_address:
+            self.ip_address = ip_address
+        else:
+            # Lay dia chi IP mac dinh
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("8.8.8.8", 80))
+                self.ip_address = s.getsockname()[0]
+                s.close()
+            except:
+                self.ip_address = "127.0.0.1"
         
         # Khoi tao GStreamer
         Gst.init(None)
@@ -87,7 +103,7 @@ class MayChuRTSPCamera:
     def chay(self):
         """Khoi dong may chu RTSP"""
         self.may_chu.attach(None)
-        print(f"May chu RTSP dang chay tai: rtsp://_your_ip_:{self.cong}{self.duong_dan}")
+        print(f"May chu RTSP dang chay tai: rtsp://{self.ip_address}:{self.cong}{self.duong_dan}")
         signal.signal(signal.SIGINT, self._xu_ly_thoat)
         
         try:
@@ -118,6 +134,8 @@ def main():
                         help='Duong dan RTSP (mac dinh: /camera)')
     parser.add_argument('--encoding', type=str, default='h264', choices=['h264', 'mjpeg'],
                         help='Ma hoa video: h264 hoac mjpeg (mac dinh: h264)')
+    parser.add_argument('--ip', type=str, default=None,
+                        help='Dia chi IP may chu (mac dinh: tu dong phat hien)')
     
     args = parser.parse_args()
     
@@ -132,7 +150,8 @@ def main():
         khung_hinh=args.fps,
         cong=args.port,
         duong_dan=args.path,
-        ma_hoa=args.encoding
+        ma_hoa=args.encoding,
+        ip_address=args.ip
     )
     
     may_chu.chay()
