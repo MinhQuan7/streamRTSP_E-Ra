@@ -1,8 +1,8 @@
 # 📷 Các bước cài đặt packages quan trọng để streaming camera trên Raspberry Pi
 
 ---
-🔧 Bước 1: Cập nhật hệ thống: 
 ```bash
+🔧 Bước 1: Cập nhật hệ thống: 
 sudo apt-get update  
 sudo apt-get upgrade
 ---
